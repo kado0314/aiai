@@ -66,13 +66,13 @@ nav button:hover {
 }
 
 /* 入力フィールドとボタンの共通スタイル */
-input[type="text"], input:not([type]) {
+input[type="text"], input:not([type]), textarea {
     width: calc(100% - 20px);
     padding: 10px;
     margin: 10px 0;
     border: 1px solid var(--border-light);
     border-radius: 6px;
-    box-sizing: border-box; /* paddingを含めた幅にする */
+    box-sizing: border-box;
     font-size: 1em;
 }
 
@@ -90,12 +90,12 @@ button {
 }
 
 button:hover {
-    background-color: #303f9f; /* 少し濃いインディゴ */
+    background-color: #303f9f;
 }
 
 /* 学習モードの特定スタイル */
 #check {
-    background-color: var(--accent-color); /* 答え合わせボタンをアクセントカラーに */
+    background-color: var(--accent-color);
 }
 
 #check:hover {
@@ -123,14 +123,15 @@ ul li {
     border-radius: 4px;
     display: flex;
     justify-content: space-between;
+    align-items: center; /* 垂直方向の中央揃え */
 }
 
 ul li:nth-child(even) {
-    background-color: #ffffff; /* 縞模様 */
+    background-color: #ffffff;
 }
 
 /* 単語追加モード */
-#add {
+#add, #bulkAdd {
     width: 100%;
-    margin-top: 20px;
+    margin-top: 10px;
 }
