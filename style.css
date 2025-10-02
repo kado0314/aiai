@@ -1,0 +1,136 @@
+/* ベーススタイルとフォント */
+:root {
+    --primary-color: #3f51b5; /* インディゴ（メインボタン色） */
+    --accent-color: #ff9800; /* オレンジ（アクセント色、結果表示など） */
+    --background-light: #f5f5f5; /* 薄いグレー（背景色） */
+    --text-dark: #212121; /* 濃いグレー（標準テキスト） */
+    --border-light: #e0e0e0; /* 薄いボーダー */
+    --shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* 軽い影 */
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 20px;
+    background-color: var(--background-light);
+    color: var(--text-dark);
+    line-height: 1.6;
+    text-align: center;
+}
+
+/* ヘッダーとタイトル */
+h1 {
+    color: var(--primary-color);
+    margin-bottom: 30px;
+    font-size: 2em;
+}
+
+h2 {
+    color: var(--text-dark);
+    margin-top: 0;
+    font-size: 1.5em;
+}
+
+/* ナビゲーション（モード選択ボタン） */
+nav {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 30px;
+}
+
+nav button {
+    background-color: #ffffff;
+    color: var(--primary-color);
+    border: 2px solid var(--primary-color);
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+nav button:hover {
+    background-color: var(--primary-color);
+    color: #ffffff;
+}
+
+/* メインコンテンツエリア */
+#view {
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+    max-width: 600px; /* PCでの表示幅を制限 */
+    margin: 0 auto; /* 中央寄せ */
+}
+
+/* 入力フィールドとボタンの共通スタイル */
+input[type="text"], input:not([type]) {
+    width: calc(100% - 20px);
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid var(--border-light);
+    border-radius: 6px;
+    box-sizing: border-box; /* paddingを含めた幅にする */
+    font-size: 1em;
+}
+
+button {
+    background-color: var(--primary-color);
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    margin: 10px 5px;
+    font-size: 1em;
+    font-weight: bold;
+    transition: background-color 0.2s;
+}
+
+button:hover {
+    background-color: #303f9f; /* 少し濃いインディゴ */
+}
+
+/* 学習モードの特定スタイル */
+#check {
+    background-color: var(--accent-color); /* 答え合わせボタンをアクセントカラーに */
+}
+
+#check:hover {
+    background-color: #f57c00;
+}
+
+#result {
+    font-weight: bold;
+    margin-top: 20px;
+    font-size: 1.1em;
+}
+
+/* リスト表示モード */
+ul {
+    list-style: none;
+    padding: 0;
+    text-align: left;
+}
+
+ul li {
+    background-color: #fafafa;
+    border-bottom: 1px solid var(--border-light);
+    padding: 10px;
+    margin-bottom: 5px;
+    border-radius: 4px;
+    display: flex;
+    justify-content: space-between;
+}
+
+ul li:nth-child(even) {
+    background-color: #ffffff; /* 縞模様 */
+}
+
+/* 単語追加モード */
+#add {
+    width: 100%;
+    margin-top: 20px;
+}
