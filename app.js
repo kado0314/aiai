@@ -33,7 +33,7 @@ function save() {
 $("#modeLearn").onclick = renderLearn;
 $("#modeList").onclick = renderList;
 $("#modeAdd").onclick = renderAdd;
-$("#modeType").onclick = renderType; // 🌟 追加 🌟
+$("#modeType").onclick = renderType; 
 
 // --- Nextボタンと多様な出題に対応した renderLearn ---
 function renderLearn() {
@@ -54,7 +54,7 @@ function renderLearn() {
   const q = words[qIndex];
 
   // 2. 出題モードをランダムに決定
-  const isEnToJa = Math.random() < 0.5; // true: 英語->日本語, false: 日本語->英語
+  const isEnToJa = Math.random() < 0.5; 
   const questionText = isEnToJa ? q.en : q.ja;
   const answerTarget = isEnToJa ? q.ja : q.en;
   const placeholderText = isEnToJa ? "日本語の答えは？" : "英語の答えは？";
@@ -171,12 +171,16 @@ function renderAdd() {
   };
 }
 
-// 🌟 タイピングゲーム機能 (renderType) の追加 🌟
+// --- タイピングゲーム機能 ---
 let currentWord = null;
 let currentInput = "";
 let currentQuestion = "";
+let timeoutId = null; // 自動切替用のタイマーID
 
 function renderType() {
+    // 既にタイマーが動いている場合はクリア（二重実行防止）
+    if (timeoutId) clearTimeout(timeoutId);
+
     if (words.length === 0) return view.innerHTML = "<p>単語がありません</p>";
 
     // 単語を選択して初期化
@@ -185,24 +189,22 @@ function renderType() {
     currentQuestion = currentWord.en; // 英単語を出題
     currentInput = "";
     
-    // 画面を表示
+    // 画面を表示 (Nextボタンは削除し、自動切替に置き換えます)
     view.innerHTML = `
         <h2>タイピングテスト</h2>
         <p style="font-size: 0.9em; color: #666;">（意味: ${currentWord.ja}）</p>
         <div id="typing-area" style="font-size: 2em; margin: 20px 0; min-height: 40px;"></div>
         <input id="type-input" type="text" style="opacity: 0; position: absolute; top: -9999px;" autofocus /> 
-        <button id="next-type" style="background-color: #4CAF50; display: none;">Next</button>
     `;
 
     const typingArea = $("#typing-area");
     const inputElement = $("#type-input");
-    const nextButton = $("#next-type");
 
     function updateDisplay() {
         let displayHTML = '';
         for (let i = 0; i < currentQuestion.length; i++) {
             let char = currentQuestion[i];
-            let color = 'var(--text-dark)'; // デフォルト
+            let color = 'var(--text-dark)'; 
             let bgColor = 'transparent';
 
             if (i < currentInput.length) {
@@ -229,12 +231,10 @@ function renderType() {
     // 🌟 キー入力イベントの処理
     inputElement.focus();
     inputElement.oninput = (e) => {
-        // 現在の入力を取得
         currentInput = e.target.value;
         
-        // 最後の文字が間違っていたら修正を促す（厳密な入力制御）
+        // 厳密な入力制御: 最後の文字が間違っていたら入力を却下
         if (currentInput.length > 0 && currentInput[currentInput.length - 1] !== currentQuestion[currentInput.length - 1]) {
-             // 間違った入力を削除して、正しい長さに戻す
              currentInput = currentInput.substring(0, currentInput.length - 1);
              e.target.value = currentInput;
         }
@@ -242,18 +242,15 @@ function renderType() {
         updateDisplay();
         
         // 完了判定
-        if (currentInput.length === currentQuestion.length) {
-            if (currentInput === currentQuestion) {
-                // 正確に打ち終えたら
-                typingArea.style.border = '2px solid #4CAF50'; // 緑の枠
-                inputElement.disabled = true;
-                nextButton.style.display = 'block';
-            }
+        if (currentInput.length === currentQuestion.length && currentInput === currentQuestion) {
+            // 正確に打ち終えたら
+            typingArea.style.border = '2px solid #4CAF50'; // 緑の枠
+            inputElement.disabled = true; // それ以上の入力を禁止
+            
+            // 🌟 2秒後に自動で次の問題へ切り替え 🌟
+            timeoutId = setTimeout(renderType, 2000); 
         }
     };
-    
-    // Nextボタンで次の問題へ
-    nextButton.onclick = renderType;
     
     // 画面が切り替わったら自動でフォーカスを当てる
     inputElement.focus();
