@@ -38,7 +38,7 @@ $("#modeAdd").onclick = renderAdd;
 function renderLearn() {
   if (words.length === 0) return view.innerHTML = "<p>単語がありません</p>";
 
-  // 1. 習熟度に基づいて出題単語を選択
+  // 1. 習熟度に基づいて出題単語を選択 (correctCountが低い単語が出やすい)
   const totalWeight = words.reduce((sum, w) => sum + (3 - Math.min(w.correctCount, 2)), 0);
   let randomWeight = Math.random() * totalWeight;
   let qIndex = 0;
@@ -53,12 +53,11 @@ function renderLearn() {
   const q = words[qIndex];
 
   // 2. 出題モードをランダムに決定
-  const isEnToJa = Math.random() < 0.5;
+  const isEnToJa = Math.random() < 0.5; // true: 英語->日本語, false: 日本語->英語
   const questionText = isEnToJa ? q.en : q.ja;
   const answerTarget = isEnToJa ? q.ja : q.en;
   const placeholderText = isEnToJa ? "日本語の答えは？" : "英語の答えは？";
   
-  // 🌟 ここで <div id="action-buttons"> を定義しています
   view.innerHTML = `
     <h2>${questionText}</h2>
     <p style="font-size: 0.8em; color: #666;">出題方向: ${isEnToJa ? '英語 → 日本語' : '日本語 → 英語'}</p>
@@ -86,7 +85,7 @@ function renderLearn() {
     
     save(); // 習熟度を保存
 
-    // --- 🌟 Nextボタンを動的に追加するロジック ---
+    // --- Nextボタンを動的に追加するロジック ---
     $("#check").disabled = true; // 答え合わせボタンを使えなくする
     
     // Nextボタンを追加
@@ -94,12 +93,13 @@ function renderLearn() {
     
     // Nextボタンが押されたら次の問題へ
     $("#next").onclick = renderLearn;
-    // --- 🌟 ------------------------------------
+    // --- ------------------------------------
   };
 }
 
 // --- リスト表示機能 ---
 function renderList() {
+    // 習熟度の高い順にソート
     const sortedWords = [...words].sort((a, b) => b.correctCount - a.correctCount);
 
     view.innerHTML = "<ul>" +
@@ -120,3 +120,52 @@ function renderAdd() {
   view.innerHTML = `
     <h3>単語の個別追加</h3>
     <input id="en" placeholder="英語" />
+    <input id="ja" placeholder="日本語" />
+    <button id="add">個別に追加</button>
+    
+    <hr style="margin: 30px 0; border: 0; border-top: 1px solid #eee;">
+    
+    <h3>単語の一括インポート</h3>
+    <textarea id="bulkData" placeholder="例:&#10;apple,りんご&#10;book,本" rows="5" style="width: 100%; resize: vertical;"></textarea>
+    <button id="bulkAdd">一括で追加</button>
+  `;
+
+  // 個別追加のロジック
+  $("#add").onclick = () => {
+    const en = $("#en").value.trim();
+    const ja = $("#ja").value.trim();
+    if (en && ja) {
+      words.push({ en: en, ja: ja, correctCount: 0 });
+      save(); 
+      alert(`「${en} - ${ja}」を追加しました。`); 
+      renderList();
+    } else {
+      alert("英語と日本語の両方を入力してください。");
+    }
+  };
+  
+  // 一括インポートのロジック
+  $("#bulkAdd").onclick = () => {
+    const data = $("#bulkData").value.trim();
+    if (!data) return alert("データを入力してください。");
+    
+    const lines = data.split('\n').filter(line => line.trim() !== '');
+    let addedCount = 0;
+    
+    lines.forEach(line => {
+      const parts = line.split(',').map(part => part.trim());
+      if (parts.length === 2 && parts[0] && parts[1]) {
+        words.push({ en: parts[0], ja: parts[1], correctCount: 0 });
+        addedCount++;
+      }
+    });
+
+    if (addedCount > 0) {
+        save();
+        alert(`${addedCount}件の単語を一括追加しました。`);
+        renderList();
+    } else {
+        alert("有効な単語データが見つかりませんでした。形式を確認してください (英語,日本語)。");
+    }
+  };
+}
