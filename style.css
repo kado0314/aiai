@@ -152,3 +152,25 @@ ul li:nth-child(even) {
 #next:hover {
     background-color: #45a049 !important;
 }
+/* style.cssの末尾に追加してください */
+
+/* タイピングエリアの見た目を整える */
+#typing-area {
+    border: 2px solid var(--border-light);
+    padding: 10px;
+    border-radius: 8px;
+    letter-spacing: 5px; /* 文字間隔を空けて見やすくする */
+    text-align: left;
+    white-space: pre; /* スペースが表示されるように */
+    font-weight: bold;
+}
+
+/* Nextボタン (タイピングモード) のスタイル */
+#next-type {
+    margin-top: 20px;
+    background-color: var(--primary-color) !important;
+}
+
+#next-type:hover {
+    background-color: #303f9f !important;
+}
