@@ -34,16 +34,16 @@ $("#modeLearn").onclick = renderLearn;
 $("#modeList").onclick = renderList;
 $("#modeAdd").onclick = renderAdd;
 
-// --- 習熟度トラッキングと多様な出題に対応した renderLearn ---
+// --- Nextボタンを追加した renderLearn ---
 function renderLearn() {
   if (words.length === 0) return view.innerHTML = "<p>単語がありません</p>";
 
-  // 1. 習熟度に基づいて出題単語を選択 (よりcorrectCountが低い単語を選びやすくする)
+  // 1. 習熟度に基づいて出題単語を選択
   const totalWeight = words.reduce((sum, w) => sum + (3 - Math.min(w.correctCount, 2)), 0);
   let randomWeight = Math.random() * totalWeight;
   let qIndex = 0;
   for (let i = 0; i < words.length; i++) {
-    const weight = 3 - Math.min(words[i].correctCount, 2); // count 0:重み3, 1:重み2, 2:重み1, 3以上:重み1
+    const weight = 3 - Math.min(words[i].correctCount, 2);
     randomWeight -= weight;
     if (randomWeight < 0) {
       qIndex = i;
@@ -52,7 +52,7 @@ function renderLearn() {
   }
   const q = words[qIndex];
 
-  // 2. 出題モードをランダムに決定 (50%の確率で逆方向)
+  // 2. 出題モードをランダムに決定
   const isEnToJa = Math.random() < 0.5; // true: 英語->日本語, false: 日本語->英語
   const questionText = isEnToJa ? q.en : q.ja;
   const answerTarget = isEnToJa ? q.ja : q.en;
@@ -62,7 +62,9 @@ function renderLearn() {
     <h2>${questionText}</h2>
     <p style="font-size: 0.8em; color: #666;">出題方向: ${isEnToJa ? '英語 → 日本語' : '日本語 → 英語'}</p>
     <input id="answer" placeholder="${placeholderText}" />
-    <button id="check">答え合わせ</button>
+    <div id="action-buttons">
+        <button id="check">答え合わせ</button>
+    </div>
     <p id="result"></p>
   `;
 
@@ -70,25 +72,33 @@ function renderLearn() {
     const ans = $("#answer").value.trim().toLowerCase();
     const ok = ans === answerTarget.toLowerCase();
     
+    // 結果を表示
     if (ok) {
         $("#result").textContent = "✅ 正解";
         // 習熟度を更新
         q.correctCount = (q.correctCount || 0) + 1;
-        save();
-        // 3秒後に次の問題へ
-        setTimeout(renderLearn, 3000); 
     } else {
         $("#result").textContent = `❌ 不正解です。正解は ${answerTarget}`;
         // 不正解の場合はカウントをリセット（または減らす）
         q.correctCount = Math.max(0, (q.correctCount || 0) - 1);
-        save();
     }
+    
+    save(); // 習熟度を保存
+
+    // --- 🌟 追加機能: Nextボタンを表示し、答え合わせボタンを無効化 ---
+    $("#check").disabled = true; // 答え合わせボタンを使えなくする
+    
+    // Nextボタンを追加
+    $("#action-buttons").innerHTML += `<button id="next" style="background-color: #4CAF50;">Next</button>`;
+    
+    // Nextボタンが押されたら次の問題へ
+    $("#next").onclick = renderLearn;
+    // --- 🌟 ----------------------------------------------------
   };
 }
 
-// --- リスト表示機能（進行状況の視覚化を少し追加） ---
+// --- リスト表示機能 ---
 function renderList() {
-    // correctCountの高い順にソート（よく覚えている単語を上にする）
     const sortedWords = [...words].sort((a, b) => b.correctCount - a.correctCount);
 
     view.innerHTML = "<ul>" +
@@ -124,7 +134,6 @@ function renderAdd() {
     const en = $("#en").value.trim();
     const ja = $("#ja").value.trim();
     if (en && ja) {
-      // 新しい単語にも correctCount: 0 を設定
       words.push({ en: en, ja: ja, correctCount: 0 });
       save(); 
       alert(`「${en} - ${ja}」を追加しました。`); 
@@ -145,7 +154,6 @@ function renderAdd() {
     lines.forEach(line => {
       const parts = line.split(',').map(part => part.trim());
       if (parts.length === 2 && parts[0] && parts[1]) {
-        // 新しい単語にも correctCount: 0 を設定
         words.push({ en: parts[0], ja: parts[1], correctCount: 0 });
         addedCount++;
       }
