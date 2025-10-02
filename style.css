@@ -135,17 +135,8 @@ ul li:nth-child(even) {
     width: 100%;
     margin-top: 10px;
 }
-/* style.cssの任意の場所に追加 */
 
-#next {
-    background-color: #4CAF50 !important; /* 目立つ緑色 */
-}
-
-#next:hover {
-    background-color: #45a049 !important;
-}
-
-/* ボタンを並べるためのラッパー */
+/* 答え合わせボタンとNextボタンのコンテナ */
 #action-buttons {
     display: flex;
     justify-content: center;
@@ -153,3 +144,11 @@ ul li:nth-child(even) {
     margin-top: 10px;
 }
 
+/* Nextボタンの色を特に目立たせる */
+#next {
+    background-color: #4CAF50 !important; 
+}
+
+#next:hover {
+    background-color: #45a049 !important;
+}
