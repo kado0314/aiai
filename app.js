@@ -33,6 +33,7 @@ function save() {
 $("#modeLearn").onclick = renderLearn;
 $("#modeList").onclick = renderList;
 $("#modeAdd").onclick = renderAdd;
+$("#modeType").onclick = renderType; // 🌟 追加 🌟
 
 // --- Nextボタンと多様な出題に対応した renderLearn ---
 function renderLearn() {
@@ -168,4 +169,92 @@ function renderAdd() {
         alert("有効な単語データが見つかりませんでした。形式を確認してください (英語,日本語)。");
     }
   };
+}
+
+// 🌟 タイピングゲーム機能 (renderType) の追加 🌟
+let currentWord = null;
+let currentInput = "";
+let currentQuestion = "";
+
+function renderType() {
+    if (words.length === 0) return view.innerHTML = "<p>単語がありません</p>";
+
+    // 単語を選択して初期化
+    const randomIndex = Math.floor(Math.random() * words.length);
+    currentWord = words[randomIndex];
+    currentQuestion = currentWord.en; // 英単語を出題
+    currentInput = "";
+    
+    // 画面を表示
+    view.innerHTML = `
+        <h2>タイピングテスト</h2>
+        <p style="font-size: 0.9em; color: #666;">（意味: ${currentWord.ja}）</p>
+        <div id="typing-area" style="font-size: 2em; margin: 20px 0; min-height: 40px;"></div>
+        <input id="type-input" type="text" style="opacity: 0; position: absolute; top: -9999px;" autofocus /> 
+        <button id="next-type" style="background-color: #4CAF50; display: none;">Next</button>
+    `;
+
+    const typingArea = $("#typing-area");
+    const inputElement = $("#type-input");
+    const nextButton = $("#next-type");
+
+    function updateDisplay() {
+        let displayHTML = '';
+        for (let i = 0; i < currentQuestion.length; i++) {
+            let char = currentQuestion[i];
+            let color = 'var(--text-dark)'; // デフォルト
+            let bgColor = 'transparent';
+
+            if (i < currentInput.length) {
+                // 入力済み
+                if (char === currentInput[i]) {
+                    color = '#4CAF50'; // 緑: 正解
+                } else {
+                    color = 'white';
+                    bgColor = '#F44336'; // 赤: 間違い
+                }
+            } else if (i === currentInput.length) {
+                // 次に入力すべき文字
+                bgColor = 'var(--border-light)';
+            }
+            
+            displayHTML += `<span style="color: ${color}; background-color: ${bgColor}; padding: 2px 0; border-radius: 4px;">${char}</span>`;
+        }
+        typingArea.innerHTML = displayHTML;
+    }
+
+    // 初回表示
+    updateDisplay();
+
+    // 🌟 キー入力イベントの処理
+    inputElement.focus();
+    inputElement.oninput = (e) => {
+        // 現在の入力を取得
+        currentInput = e.target.value;
+        
+        // 最後の文字が間違っていたら修正を促す（厳密な入力制御）
+        if (currentInput.length > 0 && currentInput[currentInput.length - 1] !== currentQuestion[currentInput.length - 1]) {
+             // 間違った入力を削除して、正しい長さに戻す
+             currentInput = currentInput.substring(0, currentInput.length - 1);
+             e.target.value = currentInput;
+        }
+
+        updateDisplay();
+        
+        // 完了判定
+        if (currentInput.length === currentQuestion.length) {
+            if (currentInput === currentQuestion) {
+                // 正確に打ち終えたら
+                typingArea.style.border = '2px solid #4CAF50'; // 緑の枠
+                inputElement.disabled = true;
+                nextButton.style.display = 'block';
+            }
+        }
+    };
+    
+    // Nextボタンで次の問題へ
+    nextButton.onclick = renderType;
+    
+    // 画面が切り替わったら自動でフォーカスを当てる
+    inputElement.focus();
 }
