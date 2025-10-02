@@ -135,3 +135,21 @@ ul li:nth-child(even) {
     width: 100%;
     margin-top: 10px;
 }
+/* style.cssの任意の場所に追加 */
+
+#next {
+    background-color: #4CAF50 !important; /* 目立つ緑色 */
+}
+
+#next:hover {
+    background-color: #45a049 !important;
+}
+
+/* ボタンを並べるためのラッパー */
+#action-buttons {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 10px;
+}
+
